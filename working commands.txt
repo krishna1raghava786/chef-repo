@@ -1,0 +1,66 @@
+working command
+pcs constraint location add loc_OHD_never_SAPPROD rsc_SAP_OHD_HDB00 SAPPROD -INFINITY
+pcs constraint location add loc_OHQ_never_SAPPROD rsc_SAP_OHQ_HDB01 SAPPROD -INFINITY
+
+pcs constraint colocation add  rsc_SAP_OHD_HDB00 rsc_ip_SAPHana_OHP_HDB02 -INFINITY
+pcs constraint colocation add  rsc_SAP_OHQ_HDB01 rsc_ip_SAPHana_OHP_HDB02 -INFINITY
+
+pcs constraint order stop rsc_SAP_OHD_HDB00 then promote msl_rsc_SAPHana_OHP_HDB02 Mandatory
+pcs constraint order stop rsc_SAP_OHQ_HDB01 then promote msl_rsc_SAPHana_OHP_HDB02 Mandatory
+
+pcs constraint order stop rsc_SAP_OHD_HDB00 then promote msl_rsc_SAPHana_OHP_HDB02 Optional
+pcs constraint order stop rsc_SAP_OHQ_HDB01 then promote msl_rsc_SAPHana_OHP_HDB02 Optional
+
+
+
+
+
+
+
+
+
+[root@SAPQUALITY heartbeat]# pcs constraint order stop rsc_SAP_OHD_HDB00 then promote msl_rsc_SAPHana_OHP_HDB02 Mandatory
+Adding rsc_SAP_OHD_HDB00 msl_rsc_SAPHana_OHP_HDB02 (kind: Mandatory) (Options: first-action=stop then-action=promote)
+[root@SAPQUALITY heartbeat]# pcs constraint order stop rsc_SAP_OHQ_HDB01 then promote msl_rsc_SAPHana_OHP_HDB02 Mandatory
+Adding rsc_SAP_OHQ_HDB01 msl_rsc_SAPHana_OHP_HDB02 (kind: Mandatory) (Options: first-action=stop then-action=promote)
+[root@SAPQUALITY heartbeat]# pcs constraint order
+Ordering Constraints:
+  stop rsc_SAP_OHD_HDB00 then promote msl_rsc_SAPHana_OHP_HDB02 (kind:Mandatory)
+  stop rsc_SAP_OHQ_HDB01 then promote msl_rsc_SAPHana_OHP_HDB02 (kind:Mandatory)
+[root@SAPQUALITY heartbeat]#
+
+
+[root@SAPPROD log]# pcs resource --full
+ Resource: rsc_ip_SAPHana_OHP_HDB02 (class=ocf provider=heartbeat type=IPaddr2)
+  Attributes: ip=192.168.57.49
+  Operations: start interval=0s timeout=20s (rsc_ip_SAPHana_OHP_HDB02-start-interval-0s)
+              stop interval=0s timeout=20s (rsc_ip_SAPHana_OHP_HDB02-stop-interval-0s)
+              monitor interval=10s timeout=20s (rsc_ip_SAPHana_OHP_HDB02-monitor-interval-10s)
+ Clone: rsc_SAPHanaTopology_OHP_HDB02-clone
+  Meta Attrs: clone-max=2 clone-node-max=1 interleave=true is-managed=true
+  Resource: rsc_SAPHanaTopology_OHP_HDB02 (class=ocf provider=heartbeat type=SAPHanaTopology)
+   Attributes: SID=OHP InstanceNumber=02
+   Operations: start interval=0s timeout=600 (rsc_SAPHanaTopology_OHP_HDB02-start-interval-0s)
+               stop interval=0s timeout=300 (rsc_SAPHanaTopology_OHP_HDB02-stop-interval-0s)
+               monitor interval=10 timeout=600 (rsc_SAPHanaTopology_OHP_HDB02-monitor-interval-10)
+ Master: msl_rsc_SAPHana_OHP_HDB02
+  Meta Attrs: interleave=true clone-max=2 notify=true is-managed=true clone-node-max=1
+  Resource: rsc_SAPHana_OHP_HDB02 (class=ocf provider=heartbeat type=SAPHana)
+   Attributes: SID=OHP InstanceNumber=02 PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200 AUTOMATED_REGISTER=false
+   Operations: start interval=0s timeout=3600 (rsc_SAPHana_OHP_HDB02-start-interval-0s)
+               stop interval=0s timeout=3600 (rsc_SAPHana_OHP_HDB02-stop-interval-0s)
+               promote interval=0s timeout=3600 (rsc_SAPHana_OHP_HDB02-promote-interval-0s)
+               demote interval=0s timeout=3600 (rsc_SAPHana_OHP_HDB02-demote-interval-0s)
+               monitor interval=59 role=Master timeout=700 (rsc_SAPHana_OHP_HDB02-monitor-interval-59)
+               monitor interval=61 role=Slave timeout=700 (rsc_SAPHana_OHP_HDB02-monitor-interval-61)
+ Resource: rsc_SAP_OHD_HDB00 (class=ocf provider=heartbeat type=SAPDatabase)
+  Attributes: SID=OHD DBTYPE=HDB MONITOR_SERVICES=hdbindexserver|hdbnameserver|Database STRICT_MONITORING=true AUTOMATIC_RECOVER=true
+  Operations: start interval=0 timeout=1800 (rsc_SAP_OHD_HDB00-start-interval-0)
+              stop interval=0 timeout=1800 (rsc_SAP_OHD_HDB00-stop-interval-0)
+              monitor interval=120 timeout=60 (rsc_SAP_OHD_HDB00-monitor-interval-120)
+ Resource: rsc_SAP_OHQ_HDB01 (class=ocf provider=heartbeat type=SAPDatabase)
+  Attributes: SID=OHQ DBTYPE=HDB MONITOR_SERVICES=hdbindexserver|hdbnameserver|Database AUTOMATIC_RECOVER=true STRICT_MONITORING=true
+  Operations: monitor interval=120 timeout=60 (rsc_SAP_OHQ_HDB01-monitor-interval-120)
+              start interval=0 timeout=1800 (rsc_SAP_OHQ_HDB01-start-interval-0)
+              stop interval=0 timeout=1800 (rsc_SAP_OHQ_HDB01-stop-interval-0)
+
